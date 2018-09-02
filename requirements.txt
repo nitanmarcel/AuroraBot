@@ -1,0 +1,6 @@
+python-telegram-bot>=10.1.0
+psycopg2-binary
+sqlalchemy
+uuid
+heroku3
+python-gitlab
