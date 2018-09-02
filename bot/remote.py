@@ -3,9 +3,9 @@ from typing import List
 import heroku3
 from telegram.ext import CommandHandler, Filters
 
-from bot import HEROK_API, dispatcher, update
+from bot import HEROKU_API, dispatcher, update
 
-heroku_conn = heroku3.from_key(HEROK_API)
+heroku_conn = heroku3.from_key(HEROKU_API)
 app = heroku_conn.apps()['aurorabugsbunny']
 
 
