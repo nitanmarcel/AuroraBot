@@ -3,7 +3,9 @@ import logging
 from telegram import ParseMode
 from telegram.ext import CommandHandler
 
-from bot import *
+from bot import (PORT, TOKEN, URL, bugs, build, dispatcher, misc, remote,
+                 suggestions, update)
+from bot.modules import *
 
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
