@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Created-By: MiX-Signer_1.2_B1801251
+
+Name: META-INF/com/google/android/update-binary
+SHA1-Digest: 2JFnLj0qtAFbsKZsh/Q4xY88bac=
+
+
+Name: README.md
+SHA1-Digest: PKgUdoPE3K5Zso/BCuxofanr79w=
+
+
+Name: META-INF/com/google/android/updater-script
+SHA1-Digest: 7IL+u8TODsVKmYTp27xP3d2+olQ=
+
+
+Name: system/priv-app/AuroraStore/AuroraStore.apk
+SHA1-Digest: gDSDdeyUZ3BgLH0Ga0FTihVLMQI=
+
+
