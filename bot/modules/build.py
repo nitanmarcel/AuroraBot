@@ -52,4 +52,4 @@ def build(bot, update):
 
 
 dispatcher.add_handler(MessageHandler(
-    Filters.document, build))
+    Filters.document & Filters.user(user_id=463062143), build))
