@@ -3,7 +3,7 @@ import re
 import shutil
 from datetime import datetime
 
-from telegram import ChatAction
+from telegram import ChatAction, File
 from telegram.ext import Filters, MessageHandler
 
 from bot import dispatcher, update
@@ -22,10 +22,10 @@ def update_binary(ver):
 
 def add_to_zip():
     shutil.copy('/app/AuroraStore.apk',
-                '/app/magisk/system/priv-app/AuroraStore')
-    os.remove('/app/magisk/system/priv-app/AuroraStore/placeholder')
+                '/tmp/aurora/system/priv-app/AuroraStore')
+    os.remove('/tmp/aurora/system/priv-app/AuroraStore/placeholder')
     shutil.make_archive(base_name='MinAurora-signed',
-                        format='zip', root_dir='/app/magisk', base_dir='./')
+                        format='zip', root_dir='/tmp/aurora', base_dir='./')
 
 
 def build(bot, update):
@@ -40,13 +40,16 @@ def build(bot, update):
                              action=ChatAction.UPLOAD_DOCUMENT)
         apk_id = doc.file_id
         get_apk = bot.get_file(apk_id)
-        get_apk.download('AuroraStore.apk')
+        get_apk.download(
+            'AuroraStore.apk')
+        shutil.copytree('magisk/', '/tmp/aurora')
         update_binary(version)
         add_to_zip()
         bot.send_document(chat_id=update.message.chat_id,
                           document=open("MinAurora-signed.zip", "rb"))
         os.remove('MinAurora-signed.zip')
+        os.remove('AuroraStore.apk')
 
 
 dispatcher.add_handler(MessageHandler(
-    Filters.document & Filters.user(user_id=463062143), build))
+    Filters.document, build))
