@@ -4,7 +4,7 @@ from telegram.ext import CommandHandler, RegexHandler
 
 import bot.sql.suggestion_sql as sql
 from bot import dispatcher, update
-from bot.sql.bugs_sql import get_bug_id
+from bot.sql.bugs_sql import count_bugs, get_bug_id
 
 
 def commit(bot, update):
@@ -36,5 +36,24 @@ def excl_get(bot, update):
             "There is no bug/suggestion matching the id {}".format(no_excl), ParseMode=ParseMode.MARKDOWN)
 
 
+def stats(bot, update):
+    bugs_in_db = count_bugs()
+    suggs_in_db = sql.count_suggestions()
+    admins_in_group = bot.get_chat_administrators(update.message.chat.id)
+    admins_list = []
+    message = update.effective_message
+    for admins in admins_in_group:
+        admins_list.append(admins.user.username)
+
+    REPLY = """
+    *Current stats:*
+    *Bugs:* `{}`,
+    *Suggestions:* `{}`,
+    *The admins of this group are:* `{}`
+    """.format(bugs_in_db, suggs_in_db, ', '.join(admins_list))
+    message.reply_text(REPLY, parse_mode=ParseMode.MARKDOWN)
+
+
 dispatcher.add_handler(CommandHandler('commits', commit))
 dispatcher.add_handler(RegexHandler(r"^![^\s]+", excl_get))
+dispatcher.add_handler(CommandHandler('stats', stats))
