@@ -1,9 +1,9 @@
 import logging
 
 from telegram import ParseMode
-from telegram.ext import CommandHandler
+from telegram.ext import CommandHandler, Filters, MessageHandler
 
-from bot import PORT, TOKEN, URL, dispatcher, update
+from bot import BLACKLIST, PORT, TOKEN, URL, WHITELIST, dispatcher, update
 from bot.modules import *
 
 logging.basicConfig(
@@ -35,8 +35,60 @@ def help(bot, update):
                      text=REPLY, parse_mode=ParseMode.MARKDOWN)
 
 
+# Whitelist function starts here:
+#
+#     Set a channel id to WHITELIST so it will allow the bot to be added only on those channels
+#     Set a channel id to BLACKLIST so it will allow not allow users to add the bot to those channels
+#     If there are channels ids in both WHITELIST and BLACKLIST only the BLACKLISTs will be taken in considerations
+#     Use export or heroku config:add (If you use heroku). config.py file will come soon.
+
+
+def whitelist_empty():
+    if len(WHITELIST) == 0:
+        return True
+    else:
+        return False
+
+
+def blacklist_empty():
+    if len(BLACKLIST) == 0:
+        return True
+    else:
+        return False
+
+
+def is_chat_allowed(bot, update):
+    if not whitelist_empty():
+        chat_id = update.effective_message.chat_id
+        if chat_id not in WHITELIST:
+            bot.send_message(chat_id=update.message.chat_id,
+                             text='Unallowed chat! Leaving...')
+            bot.leave_chat(chat_id)
+        else:
+            pass
+    elif not blacklist_empty():
+        chat_id = update.effective_message.chat_id
+        if chat_id in BLACKLIST:
+            bot.send_message(chat_id=update.message.chat_id,
+                             text='Unallowed chat! Leaving...')
+            bot.leave_chat(chat_id)
+        else:
+            pass
+    elif not whitelist_empty() and blacklist_empty():
+        chat_id = update.effective_message.chat_id
+        if chat_id in BLACKLIST:
+            bot.send_message(chat_id=update.message.chat_id,
+                             text='Unallowed chat, leaving')
+            bot.leave_chat(chat_id)
+        else:
+            pass
+    else:
+        pass
+
+
 if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('help', help))
-
+    dispatcher.add_handler(MessageHandler(
+        Filters.all & (~ Filters.private), is_chat_allowed))
     update.start_polling()
