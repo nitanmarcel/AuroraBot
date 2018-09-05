@@ -58,30 +58,33 @@ def blacklist_empty():
 
 
 def is_chat_allowed(bot, update):
-    if not whitelist_empty():
+    if len(WHITELIST_CHATS) != 0:
         chat_id = update.effective_message.chat_id
-        if chat_id not in WHITELIST:
+        if chat_id not in WHITELIST_CHATS:
             bot.send_message(chat_id=update.message.chat_id,
                              text='Unallowed chat! Leaving...')
-            bot.leave_chat(chat_id)
-        else:
-            pass
-    elif not blacklist_empty():
+            try:
+                bot.leave_chat(chat_id)
+            finally:
+                raise DispatcherHandlerStop
+    if len(BLACKLIST_CHATS) != 0:
         chat_id = update.effective_message.chat_id
-        if chat_id in BLACKLIST:
+        if chat_id in BLACKLIST_CHATS:
             bot.send_message(chat_id=update.message.chat_id,
                              text='Unallowed chat! Leaving...')
-            bot.leave_chat(chat_id)
-        else:
-            pass
-    elif not whitelist_empty() and blacklist_empty():
+            try:
+                bot.leave_chat(chat_id)
+            finally:
+                raise DispatcherHandlerStop
+    if len(WHITELIST_CHATS) != 0 and len(BLACKLIST_CHATS) != 0:
         chat_id = update.effective_message.chat_id
-        if chat_id in BLACKLIST:
+        if chat_id in BLACKLIST_CHATS:
             bot.send_message(chat_id=update.message.chat_id,
                              text='Unallowed chat, leaving')
-            bot.leave_chat(chat_id)
-        else:
-            pass
+            try:
+                bot.leave_chat(chat_id)
+            finally:
+                raise DispatcherHandlerStop
     else:
         pass
 
@@ -90,5 +93,5 @@ if __name__ == '__main__':
     dispatcher.add_handler(CommandHandler('start', start))
     dispatcher.add_handler(CommandHandler('help', help))
     dispatcher.add_handler(MessageHandler(
-        Filters.all & (~ Filters.private), is_chat_allowed))
+        Filters.group, is_chat_allowed))
     update.start_polling()
